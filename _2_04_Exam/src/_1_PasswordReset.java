@@ -11,8 +11,8 @@ public class _1_PasswordReset {
 
         while (!(line = scanner.nextLine()).equals("Done")) {
 
-            String[] lineArr = line.split("\\s+");
-            switch (lineArr[0]) {
+            String[] tokens = line.split("\\s+");
+            switch (tokens[0]) {
                 case "TakeOdd":
                     for (int i = 0; i < password.length(); i++) {
                         if (i % 2 != 0) {
@@ -24,27 +24,22 @@ public class _1_PasswordReset {
                     break;
 
                 case "Cut":
-                    int index = Integer.parseInt(lineArr[1]);
-                    int length = Integer.parseInt(lineArr[2]);
-                    String substringCut = password.substring(index, index + length);
-                    password = password.replace(substringCut, "");
+                    int index = Integer.parseInt(tokens[1]);
+                    int length = Integer.parseInt(tokens[2]);
+                    String first = password.substring(0, index);
+                    String last = password.substring(index + length);
+                    password = first + last;
                     System.out.println(password);
                     break;
 
                 case "Substitute":
-                    String substringSubstitute = lineArr[1];
-                    String substituteSubstitute = lineArr[2];
+                    String substrSubstitute = tokens[1];
+                    String substitSubstitute = tokens[2];
 
-                    if (!password.contains(substringSubstitute)) {
+                    if (!password.contains(substrSubstitute)) {
                         System.out.println("Nothing to replace!");
                     } else {
-                        while (true) {
-                            if (password.contains(substringSubstitute)) {
-                                password = password.replace(substringSubstitute, substituteSubstitute);
-                            } else {
-                                break;
-                            }
-                        }
+                        password = password.replaceAll(substrSubstitute, substitSubstitute);
                         System.out.println(password);
                     }
                     break;

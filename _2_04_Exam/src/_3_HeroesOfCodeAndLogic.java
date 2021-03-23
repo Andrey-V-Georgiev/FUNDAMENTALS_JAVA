@@ -27,6 +27,11 @@ public class _3_HeroesOfCodeAndLogic {
 
             String command = commandsLine.get(0);
             String name = commandsLine.get(1);
+            boolean validName = heroes.containsKey(name);
+            if(!validName) {
+                commandsLine = Arrays.asList(scanner.nextLine().split("\\s+-\\s+").clone());
+                continue;
+            }
             Integer hpPoints;
             Integer mpPoints;
 
