@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class _3_HeroesOfCodeAndLogic {
 
@@ -13,33 +12,26 @@ public class _3_HeroesOfCodeAndLogic {
         for (int i = 0; i < n; i++) {
             String[] line = scanner.nextLine().split("\\s+");
             String name = line[0];
-            Integer hitPoints = Math.min(Integer.parseInt(line[1]), 100);
-            Integer manaPoints = Math.min(Integer.parseInt(line[2]), 200);
-            Integer[] hInfo = {hitPoints, manaPoints};
+            int hp = Math.min(Integer.parseInt(line[1]), 100);
+            int mp = Math.min(Integer.parseInt(line[2]), 200);
+            Integer[] points = new Integer[]{hp, mp};
 
-            heroes.put(name, hInfo);
+            heroes.put(name, points);
         }
-        List<String> commandsLine = new ArrayList<>();
-        commandsLine = Arrays.asList(scanner.nextLine().split("\\s+-\\s+").clone());
 
         /* Execute the commands */
-        while (!commandsLine.get(0).equals("End")) {
+        String[] tokens;
+        String line = scanner.nextLine();
+        while (!line.equals("End")) {
 
-            String command = commandsLine.get(0);
-            String name = commandsLine.get(1);
-            boolean validName = heroes.containsKey(name);
-            if(!validName) {
-                commandsLine = Arrays.asList(scanner.nextLine().split("\\s+-\\s+").clone());
-                continue;
-            }
-            Integer hpPoints;
-            Integer mpPoints;
+            tokens = line.split("\\s+-\\s+");
+            String command = tokens[0];
+            String name = tokens[1];
 
             switch (command) {
-
                 case "CastSpell":
-                    Integer mpNeeded = Integer.parseInt(commandsLine.get(2));
-                    String spellName = commandsLine.get(3);
+                    Integer mpNeeded = Integer.parseInt(tokens[2]);
+                    String spellName = tokens[3];
 
                     if (heroes.get(name)[1] >= mpNeeded) {
                         heroes.get(name)[1] -= mpNeeded;
@@ -51,10 +43,11 @@ public class _3_HeroesOfCodeAndLogic {
                     }
                     break;
 
-                case "TakeDamage": {
-                    Integer damage = Integer.parseInt(commandsLine.get(2));
-                    String attacker = commandsLine.get(3);
+                case "TakeDamage":
+                    int damage = Integer.parseInt(tokens[2]);
+                    String attacker = tokens[3];
                     heroes.get(name)[0] -= damage;
+
                     if (heroes.get(name)[0] > 0) {
                         System.out.printf(
                                 "%s was hit for %d HP by %s and now has %d HP left!\n",
@@ -63,36 +56,39 @@ public class _3_HeroesOfCodeAndLogic {
                         heroes.remove(name);
                         System.out.printf("%s has been killed by %s!\n", name, attacker);
                     }
-                }
-                break;
+                    break;
 
                 case "Recharge":
-                    Integer rechargeAmount = Integer.parseInt(commandsLine.get(2));
-                    Integer rechargedValue = (heroes.get(name)[1] + rechargeAmount) > 200 ? (200 - heroes.get(name)[1]) : rechargeAmount;
+                    Integer rechargeAmount = Integer.parseInt(tokens[2]);
+                    int rechargedValue = (heroes.get(name)[1] + rechargeAmount) > 200 ? (200 - heroes.get(name)[1]) : rechargeAmount;
                     heroes.get(name)[1] += rechargedValue;
                     System.out.printf("%s recharged for %d MP!\n", name, rechargedValue);
                     break;
 
                 case "Heal":
-                    Integer healAmount = Integer.parseInt(commandsLine.get(2));
-                    Integer healedValue = (heroes.get(name)[0] + healAmount) > 100 ? (100 - heroes.get(name)[0]) : healAmount;
+                    Integer healAmount = Integer.parseInt(tokens[2]);
+                    int healedValue = (heroes.get(name)[0] + healAmount) > 100 ? (100 - heroes.get(name)[0]) : healAmount;
                     heroes.get(name)[0] += healedValue;
                     System.out.printf("%s healed for %d HP!\n", name, healedValue);
                     break;
+
             }
-            commandsLine = Arrays.asList(scanner.nextLine().split("\\s+-\\s+").clone());
+            line = scanner.nextLine();
         }
 
-        Map<String, Integer[]> sortedHeroes = heroes
-                .entrySet()
+        heroes.entrySet()
                 .stream()
-                .sorted(Map.Entry.<String, Integer[]>comparingByValue((v1, v2) -> v2[0].compareTo(v1[0])))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-        for (Map.Entry<String, Integer[]> hero : sortedHeroes.entrySet()) {
-            System.out.println(hero.getKey());
-            System.out.printf("  HP: %d\n", hero.getValue()[0]);
-            System.out.printf("  MP: %d\n", hero.getValue()[1]);
-        }
+                .sorted((a, b) -> {
+                    int result = b.getValue()[0] - a.getValue()[0];
+                    if (result == 0) {
+                        result = a.getKey().compareTo(b.getKey());
+                    }
+                    return result;
+                })
+                .forEach(hero -> {
+                    System.out.println(hero.getKey());
+                    System.out.printf("  HP: %d\n", hero.getValue()[0]);
+                    System.out.printf("  MP: %d\n", hero.getValue()[1]);
+                });
     }
 }
